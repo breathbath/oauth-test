@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: oauth-test
+  labels:
+    app.kubernetes.io/instance: oauth-test
+    app.kubernetes.io/managed-by: kubectl
+    app.kubernetes.io/name: oauth-test
+    app.kubernetes.io/version: master
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: oauth-test
+      app.kubernetes.io/name: oauth-test
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/instance: oauth-test
+        app.kubernetes.io/name: oauth-test
+    spec:
+      containers:
+        - name: oauth-test
+          image: breathbath/oauth-test:latest
+          imagePullPolicy: IfNotPresent
+          command: ["/app/auth"]
+          ports:
+            - name: http
+              containerPort: 8000
+              protocol: TCP
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            readOnlyRootFilesystem: true
+            runAsGroup: 1000
+            runAsNonRoot: true
+            runAsUser: 1000
+      restartPolicy: Always
+      securityContext:
+        fsGroup: 1000
